@@ -217,3 +217,62 @@ func TestUnion2by2_5(t *testing.T) {
 		}
 	}
 }
+
+func TestExclusiveUnion2by2_1(t *testing.T) {
+	count := 100
+	set1 := make([]uint16, 0, count)
+	set2 := make([]uint16, 0, count)
+
+	for i := 0; i < count; i += 2 {
+		set1 = append(set1, uint16(i))
+		set2 = append(set2, uint16(i+1))
+	}
+
+	total, buffer := exclusiveUnion2by2(set1, len(set1), set2, len(set2), len(set1)+len(set2))
+	if total != count {
+		t.Errorf("Union total: %d, want: %d", total, count)
+	}
+	for k, v := range buffer {
+		if uint16(k) != v {
+			t.Errorf("Union: %d, want: %d", v, k)
+			break
+		}
+	}
+}
+
+func TestExclusiveUnion2by2_2(t *testing.T) {
+	count := 100
+	set1 := make([]uint16, 0, count)
+	set2 := make([]uint16, 0, count)
+
+	for i := 0; i < count; i += 2 {
+		set1 = append(set1, uint16(i))
+		set2 = append(set2, uint16(i))
+	}
+
+	total, buffer := exclusiveUnion2by2(set1, len(set1), set2, len(set2), len(set1)+len(set2))
+	if total != 0 || len(buffer) > 0 {
+		t.Errorf("Union total: %d, want: %d", total, count)
+	}
+}
+
+func TestExclusiveUnion2by2_3(t *testing.T) {
+	count := 100
+	set1 := make([]uint16, 0, count)
+	set2 := make([]uint16, 0)
+
+	for i := 0; i < count; i++ {
+		set1 = append(set1, uint16(i))
+	}
+
+	total, buffer := exclusiveUnion2by2(set1, len(set1), set2, len(set2), len(set1)+len(set2))
+	if total != count {
+		t.Errorf("Union total: %d, want: %d", total, count)
+	}
+	for k, v := range buffer {
+		if uint16(k) != v {
+			t.Errorf("Union: %d, want: %d", v, k)
+			break
+		}
+	}
+}

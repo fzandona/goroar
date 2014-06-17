@@ -10,14 +10,16 @@ type bitmapContainer struct {
 	bitmap      []uint64
 }
 
+var _ container = (*bitmapContainer)(nil)
+
 func newBitmapContainer() *bitmapContainer {
 	return &bitmapContainer{0, make([]uint64, bitmapContainerMaxCapacity/64)}
 }
 
-func (bc *bitmapContainer) loadData(arrayContainer *arrayContainer) {
-	bc.cardinality = arrayContainer.cardinality
-	for _, x := range arrayContainer.content {
-		bc.bitmap[uint32(x)/64] |= one << (x % 64)
+func (bc *bitmapContainer) loadData(ac *arrayContainer) {
+	bc.cardinality = ac.cardinality
+	for i := 0; i < ac.cardinality; i++ {
+		bc.bitmap[uint32(ac.content[i])/64] |= one << (ac.content[i] % 64)
 	}
 }
 
@@ -85,8 +87,8 @@ func (bc *bitmapContainer) or(other container) container {
 
 func (bc *bitmapContainer) orArray(ac *arrayContainer) *bitmapContainer {
 	answer := bc.clone()
-	for _, v := range ac.content {
-		answer.add(v)
+	for i := 0; i < ac.cardinality; i++ {
+		answer.add(ac.content[i])
 	}
 	return answer
 }
@@ -97,6 +99,46 @@ func (bc *bitmapContainer) orBitmap(other *bitmapContainer) container {
 	for i := 0; i < len(bc.bitmap); i++ {
 		answer.bitmap[i] = bc.bitmap[i] | other.bitmap[i]
 		answer.cardinality = answer.cardinality + countBits(answer.bitmap[i])
+	}
+	return answer
+}
+func (bc *bitmapContainer) xor(other container) container {
+	switch oc := other.(type) {
+	case *arrayContainer:
+		return bc.xorArray(oc)
+	case *bitmapContainer:
+		return bc.xorBitmap(oc)
+	}
+	return nil
+}
+
+func (bc *bitmapContainer) xorArray(ac *arrayContainer) container {
+	answer := bc.clone()
+	for i := 0; i < ac.cardinality; i++ {
+		v := ac.content[i]
+		mod := v % 64
+		index := v / 64
+		shift := one << v
+		answer.cardinality += 1 - 2*int((answer.bitmap[index]&shift)>>mod)
+		answer.bitmap[index] ^= shift
+
+	}
+	if answer.cardinality <= arrayContainerMaxSize {
+		return answer.toArrayContainer()
+	}
+	return answer
+}
+
+func (bc *bitmapContainer) xorBitmap(other *bitmapContainer) container {
+	answer := newBitmapContainer()
+
+	for i := 0; i < len(bc.bitmap); i++ {
+		answer.bitmap[i] = bc.bitmap[i] ^ other.bitmap[i]
+		answer.cardinality = answer.cardinality + countBits(answer.bitmap[i])
+	}
+
+	if answer.cardinality <= arrayContainerMaxSize {
+		return answer.toArrayContainer()
 	}
 	return answer
 }

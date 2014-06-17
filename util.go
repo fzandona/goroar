@@ -275,6 +275,27 @@ func fillArrayAND(bitmap1, bitmap2 []uint64, newCardinality int) []uint16 {
 	return container
 }
 
+func fillArrayXOR(bitmap1, bitmap2 []uint64, newCardinality int) []uint16 {
+	pos := 0
+
+	if len(bitmap1) != len(bitmap2) {
+		panic("Bitmaps have different length - not supported.")
+	}
+
+	container := make([]uint16, newCardinality)
+	for k := 0; k < len(bitmap1); k++ {
+		bitset := bitmap1[k] ^ bitmap2[k]
+		for bitset != 0 {
+			t := bitset & -bitset
+			container[pos] = uint16((k*64 + countBits(t-1)))
+			pos++
+			bitset ^= t
+		}
+	}
+
+	return container
+}
+
 // http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightBinSearch
 func trailingZeros(v uint64) int {
 	if v&0x1 == 1 {
@@ -308,7 +329,7 @@ func trailingZeros(v uint64) int {
 	return c - int(v&0x1)
 }
 
-// Unite two sorted lists and write the result to the provided output array
+// Unite two sorted lists
 func union2by2(set1 []uint16, length1 int,
 	set2 []uint16, length2, bufferSize int) (int, []uint16) {
 
@@ -343,6 +364,72 @@ func union2by2(set1 []uint16, length1 int,
 		} else if set1[k1] == set2[k2] {
 			buffer[pos] = set1[k1]
 			pos = pos + 1
+			k1 = k1 + 1
+			k2 = k2 + 1
+			if k1 >= length1 {
+				for ; k2 < length2; k2++ {
+					buffer[pos] = set2[k2]
+					pos = pos + 1
+				}
+				break
+			}
+			if k2 >= length2 {
+				for ; k1 < length1; k1++ {
+					buffer[pos] = set2[k1]
+					pos = pos + 1
+				}
+				break
+			}
+		} else {
+			buffer[pos] = set2[k2]
+			pos = pos + 1
+			k2 = k2 + 1
+			if k2 >= length2 {
+				for ; k1 < length1; k1++ {
+					buffer[pos] = set2[k1]
+					pos = pos + 1
+				}
+				break
+			}
+		}
+	}
+	return pos, buffer[:pos]
+}
+
+// Compute the exclusive union of two sorted lists
+func exclusiveUnion2by2(set1 []uint16, length1 int,
+	set2 []uint16, length2, bufferSize int) (int, []uint16) {
+
+	if 0 == length2 {
+		buffer := make([]uint16, length1)
+		copy(buffer, set1)
+		return length1, buffer
+	}
+
+	if 0 == length1 {
+		buffer := make([]uint16, length2)
+		copy(buffer, set2)
+		return length2, buffer
+	}
+
+	buffer := make([]uint16, bufferSize)
+
+	k1, k2, pos := 0, 0, 0
+
+	for {
+		if set1[k1] < set2[k2] {
+			buffer[pos] = set1[k1]
+			pos = pos + 1
+			k1 = k1 + 1
+			if k1 >= length1 {
+				for ; k2 < length2; k2++ {
+					buffer[pos] = set2[k2]
+					pos = pos + 1
+				}
+				break
+			}
+		} else if set1[k1] == set2[k2] {
+			buffer[pos] = set1[k1]
 			k1 = k1 + 1
 			k2 = k2 + 1
 			if k1 >= length1 {

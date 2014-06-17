@@ -314,6 +314,10 @@ func TestInPlaceOr_1(t *testing.T) {
 
 	rb1.Or(rb2)
 
+	if rb1.Cardinality() != count {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), 5000)
+	}
+
 	var pos uint32
 	for v := range rb1.Iterator() {
 		if v != pos {
@@ -342,10 +346,14 @@ func TestInPlaceOr_2(t *testing.T) {
 
 	rb1.Or(rb2)
 
+	if rb1.Cardinality() != len(buffer) {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), 5000)
+	}
+
 	pos := 0
 	for v := range rb1.Iterator() {
 		if v != buffer[pos] {
-			t.Errorf("And: %d, want: %d", v, buffer[pos])
+			t.Errorf("Or: %d, want: %d", v, buffer[pos])
 		}
 		pos = pos + 1
 	}
@@ -368,10 +376,14 @@ func TestInPlaceOr_3(t *testing.T) {
 
 	rb1.Or(rb2)
 
+	if rb1.Cardinality() != len(buffer) {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), 5000)
+	}
+
 	pos := 0
 	for v := range rb1.Iterator() {
 		if v != buffer[pos] {
-			t.Errorf("And: %d, want: %d", v, buffer[pos])
+			t.Errorf("Or: %d, want: %d", v, buffer[pos])
 		}
 		pos = pos + 1
 	}
@@ -399,10 +411,14 @@ func TestInPlaceOr_4(t *testing.T) {
 	copy(buffer[1:], buffer)
 	buffer[0] = 0
 
+	if rb1.Cardinality() != len(buffer) {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), 5000)
+	}
+
 	pos := 0
 	for v := range rb1.Iterator() {
 		if v != buffer[pos] {
-			t.Errorf("And: %d, want: %d", v, buffer[pos])
+			t.Errorf("Or: %d, want: %d", v, buffer[pos])
 		}
 		pos = pos + 1
 	}
@@ -426,9 +442,129 @@ func TestInPlaceOr_5(t *testing.T) {
 	pos := 0
 	for v := range rb1.Iterator() {
 		if int(v) != pos {
-			t.Errorf("And: %d, want: %d", v, pos)
+			t.Errorf("Or: %d, want: %d", v, pos)
 		}
 		pos = pos + 1
+	}
+}
+
+func TestInPlaceXor_1(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+	count := 100
+
+	for i := 0; i < count; i += 2 {
+		rb1.Add(uint32(i))
+		rb2.Add(uint32(i + 1))
+	}
+
+	rb1.Xor(rb2)
+
+	if rb1.Cardinality() != count {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), 5000)
+	}
+
+	var pos uint32
+	for v := range rb1.Iterator() {
+		if v != pos {
+			t.Errorf("Xor: %d, want: %d", v, pos)
+			break
+		}
+		pos++
+	}
+
+	if int(pos) != count {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), 5000)
+	}
+}
+
+func TestInPlaceXor_2(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+	var buffer []uint32
+	count := 5000
+	// creates 5 containers with keys: 1, 2, 4, 8, 16
+	for shift := uint(16); shift <= 20; shift++ {
+		base := uint32(1 << shift)
+		for i := 0; i < count; i++ {
+			value := base + uint32(i)
+			rb1.Add(value)
+			rb2.Add(value)
+			buffer = append(buffer, value)
+		}
+	}
+
+	rb1.Xor(rb2)
+
+	if rb1.Cardinality() != 0 {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), 0)
+	}
+}
+
+func TestInPlaceXor_3(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+	count := 5000
+
+	rb1.Add(uint32(0))
+	for i := 1; i < count; i++ {
+		rb2.Add(uint32(i))
+	}
+
+	t.Log(rb1)
+	t.Log(rb2.Cardinality())
+	rb1.Xor(rb2)
+
+	if rb1.Cardinality() != count {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), count)
+	}
+
+	pos := 0
+	for v := range rb1.Iterator() {
+		if int(v) != pos {
+			t.Errorf("Xor: %d, want: %d", v, pos)
+			break
+		}
+		pos = pos + 1
+	}
+}
+
+func TestInPlaceXor_4(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+	var buffer []uint32
+	count := 500
+	// creates 5 containers with keys: 1, 2, 4, 8, 16
+	for shift := uint(16); shift <= 20; shift++ {
+		base := uint32(1 << shift)
+		for i := 0; i < count; i++ {
+			value := base + uint32(i)
+			rb1.Add(value)
+			buffer = append(buffer, value)
+		}
+	}
+
+	rb2.Add(0)
+	rb1.Xor(rb2)
+
+	buffer = append(buffer, 0)
+	copy(buffer[1:], buffer)
+	buffer[0] = 0
+
+	if rb1.Cardinality() != len(buffer) {
+		t.Errorf("Cardinality: %d, want: %d", rb1.Cardinality(), 5000)
+	}
+
+	pos := 0
+	for v := range rb1.Iterator() {
+		if v != buffer[pos] {
+			t.Errorf("Or: %d, want: %d", v, buffer[pos])
+		}
+		pos = pos + 1
+	}
+
+	if pos != len(buffer) {
+		t.Errorf("Pos: %d, want: %d", pos, 5000)
 	}
 }
 

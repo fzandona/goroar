@@ -126,6 +126,47 @@ func (ac *arrayContainer) orBitmap(bc *bitmapContainer) container {
 	return bc.or(ac)
 }
 
+func (ac *arrayContainer) xor(other container) container {
+	switch oc := other.(type) {
+	case *arrayContainer:
+		return ac.xorArray(oc)
+	case *bitmapContainer:
+		return ac.xorBitmap(oc)
+	}
+	return nil
+}
+
+func (ac *arrayContainer) xorArray(other *arrayContainer) container {
+	totalCardinality := ac.cardinality + other.cardinality
+	if totalCardinality > arrayContainerMaxSize {
+		bc := newBitmapContainer()
+		for i := 0; i < other.cardinality; i++ {
+			index := other.content[i] / 64
+			bc.bitmap[index] ^= one << other.content[i]
+		}
+		for i := 0; i < ac.cardinality; i++ {
+			index := ac.content[i] / 64
+			bc.bitmap[index] ^= one << ac.content[i]
+		}
+		for _, bitmap := range bc.bitmap {
+			bc.cardinality += countBits(bitmap)
+		}
+		if bc.cardinality <= arrayContainerMaxSize {
+			return bc.toArrayContainer()
+		}
+		return bc
+	}
+	answer := arrayContainer{}
+	pos, content := exclusiveUnion2by2(ac.content, ac.cardinality, other.content, other.cardinality, totalCardinality)
+	answer.cardinality = pos
+	answer.content = content
+	return &answer
+}
+
+func (ac *arrayContainer) xorBitmap(bc *bitmapContainer) container {
+	return bc.xor(ac)
+}
+
 func (ac *arrayContainer) andNot(value2 *arrayContainer) *arrayContainer {
 	cardinality, content := difference(ac.content, ac.cardinality,
 		value2.content, value2.cardinality)

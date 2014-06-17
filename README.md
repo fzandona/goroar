@@ -5,8 +5,8 @@ goroar
 
 **TODO**
 
-* Bitwise XOR, NOT, andNot (in-place)
+* Bitwise andNot (in-place)
 * Immutable bitwise operations
 * Serialization
-* Move to idiomatic Go 
+* More idiomatic Go 
 * Test re-factoring & benchmarking
