@@ -217,6 +217,50 @@ main:
 	}
 }
 
+// AndNot computes the bitwise andNot operation (difference)
+// The receiving RoaringBitmap is modified - the input one is not.
+func (rb *RoaringBitmap) AndNot(other *RoaringBitmap) {
+	pos1, pos2 := 0, 0
+	length1 := len(rb.containers)
+	length2 := len(other.containers)
+
+main:
+	for pos1 < length1 && pos2 < length2 {
+		s1 := rb.keyAtIndex(pos1)
+		s2 := other.keyAtIndex(pos2)
+		for {
+			if s1 < s2 {
+				pos1++
+				if pos1 == length1 {
+					break main
+				}
+				s1 = rb.keyAtIndex(pos1)
+			} else if s1 > s2 {
+				pos2++
+				if pos2 == length2 {
+					break main
+				}
+				s2 = other.containers[pos2].key
+			} else {
+				c := rb.containers[pos1].container.andNot(other.containers[pos2].container)
+				if c.getCardinality() > 0 {
+					rb.containers[pos1].container = c
+					pos1++
+				} else {
+					rb.removeAtIndex(pos1)
+					length1--
+				}
+				pos2++
+				if pos1 == length1 || pos2 == length2 {
+					break main
+				}
+				s1 = rb.containers[pos1].key
+				s2 = other.containers[pos2].key
+			}
+		}
+	}
+}
+
 // Iterator returns an iterator over the RoaringBitmap which can be used with "for range".
 func (rb *RoaringBitmap) Iterator() <-chan uint32 {
 	ch := make(chan uint32)

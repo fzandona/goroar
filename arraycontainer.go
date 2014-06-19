@@ -167,7 +167,17 @@ func (ac *arrayContainer) xorBitmap(bc *bitmapContainer) container {
 	return bc.xor(ac)
 }
 
-func (ac *arrayContainer) andNot(value2 *arrayContainer) *arrayContainer {
+func (ac *arrayContainer) andNot(other container) container {
+	switch oc := other.(type) {
+	case *arrayContainer:
+		return ac.andNotArray(oc)
+	case *bitmapContainer:
+		return ac.andNotBitmap(oc)
+	}
+	return nil
+}
+
+func (ac *arrayContainer) andNotArray(value2 *arrayContainer) *arrayContainer {
 	cardinality, content := difference(ac.content, ac.cardinality,
 		value2.content, value2.cardinality)
 
@@ -175,17 +185,16 @@ func (ac *arrayContainer) andNot(value2 *arrayContainer) *arrayContainer {
 }
 
 func (ac *arrayContainer) andNotBitmap(value2 *bitmapContainer) *arrayContainer {
-	content := make([]uint16, ac.cardinality)
-
 	pos := 0
 	for k := 0; k < ac.cardinality; k++ {
 		if !value2.contains(ac.content[k]) {
-			content[pos] = ac.content[k]
+			ac.content[pos] = ac.content[k]
 			pos++
 		}
 	}
+	ac.cardinality = pos
 
-	return &arrayContainer{pos, content[:pos]}
+	return ac
 }
 
 func (ac *arrayContainer) contains(x uint16) bool {

@@ -568,6 +568,112 @@ func TestInPlaceXor_4(t *testing.T) {
 	}
 }
 
+func TestInPlaceAndNot(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+	count := 5000
+	// creates 5 containers with keys: 1, 2, 4, 8, 16
+	for shift := uint(16); shift <= 20; shift++ {
+		base := uint32(1 << shift)
+		for i := 0; i < count; i++ {
+			value := base + uint32(i)
+			rb1.Add(value)
+			rb2.Add(value)
+		}
+	}
+
+	rb1.AndNot(rb2)
+	if rb1.Cardinality() != 0 {
+		t.Errorf("Cardinality: %d, want: 0", rb1.Cardinality())
+	}
+}
+
+func TestInPlaceAndNot_2(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+
+	for i := 0; i < 200000; i += 4 {
+		rb2.Add(uint32(i))
+	}
+
+	for i := 2000000; i < 400000; i += 14 {
+		rb2.Add(uint32(i))
+	}
+
+	rb1.AndNot(rb2)
+	if rb1.Cardinality() != 0 && rb2.Cardinality() != 5000 {
+		t.Errorf("Cardinality: %d/%d, want: 0/5000", rb1.Cardinality(), rb2.Cardinality())
+	}
+
+	rb2.AndNot(rb1)
+	if rb1.Cardinality() != 0 && rb2.Cardinality() != 5000 {
+		t.Errorf("Cardinality: %d/%d, want: 0/5000", rb1.Cardinality(), rb2.Cardinality())
+	}
+}
+
+func TestInPlaceAndNot_3(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+	count := 10000
+
+	for i := 0; i < count; i++ {
+		rb1.Add(uint32(i))
+		rb2.Add(uint32(i))
+	}
+
+	rb1.AndNot(rb2)
+	if rb1.Cardinality() != 0 {
+		t.Errorf("Cardinality: %d, want: 0", rb1.Cardinality())
+	}
+}
+
+func TestInPlaceAndNot_4(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+
+	count := 10000
+
+	for i := 0; i < count; i += 2 {
+		rb1.Add(uint32(i))
+		rb2.Add(uint32(i + 1))
+	}
+
+	rb1.AndNot(rb2)
+
+	if rb1.Cardinality() != count/2 {
+		t.Errorf("Cardinality: %d/%d, want: 0/5000", rb1.Cardinality(), rb2.Cardinality())
+	}
+
+	var pos uint32
+	for v := range rb1.Iterator() {
+		if v != pos {
+			t.Errorf("AndNot: %d, want: %d", v, pos)
+			break
+		}
+		pos += 2
+	}
+}
+
+func TestInPlaceAndNot_5(t *testing.T) {
+	rb1 := New()
+	rb2 := New()
+	count := 4000 // testing ArrayContainer
+	// creates 5 containers with keys: 1, 2, 4, 8, 16
+	for shift := uint(16); shift <= 20; shift++ {
+		base := uint32(1 << shift)
+		for i := 0; i < count; i++ {
+			value := base + uint32(i)
+			rb1.Add(value)
+			rb2.Add(value)
+		}
+	}
+
+	rb1.AndNot(rb2)
+	if rb1.Cardinality() != 0 {
+		t.Errorf("Cardinality: %d, want: 0", rb1.Cardinality())
+	}
+}
+
 func TestString(t *testing.T) {
 	rb := New()
 	iterations := 5

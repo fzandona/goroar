@@ -3,7 +3,7 @@ package goroar
 type container interface {
 	and(x container) container
 	or(x container) container
-	// andNot(x container) container
+	andNot(x container) container
 	// not(x container) container
 	xor(x container) container
 

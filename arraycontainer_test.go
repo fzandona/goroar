@@ -171,7 +171,7 @@ func TestAndNot(t *testing.T) {
 		ac2.add(uint16(i + 5))
 	}
 
-	answer := ac1.andNot(ac2)
+	answer := ac1.andNotArray(ac2)
 	if answer.cardinality != 5 {
 		t.Errorf("Cardinality: %d, want: %d", answer.cardinality, 10)
 	}
@@ -190,7 +190,7 @@ func TestAndNot_2(t *testing.T) {
 		ac1.add(uint16(i))
 	}
 
-	answer := ac1.andNot(ac2)
+	answer := ac1.andNotArray(ac2)
 	if answer.cardinality != ac1.cardinality {
 		t.Errorf("Cardinality: %d, want: %d", answer.cardinality, ac1.cardinality)
 	}
@@ -209,7 +209,7 @@ func TestAndNot_3(t *testing.T) {
 		ac2.add(uint16(i))
 	}
 
-	answer := ac1.andNot(ac2)
+	answer := ac1.andNotArray(ac2)
 	if answer.cardinality != 0 {
 		t.Errorf("Cardinality: %d, want: %d", answer.cardinality, ac1.cardinality)
 	}
@@ -231,7 +231,7 @@ func TestAndNot_4(t *testing.T) {
 		ac2.add(uint16(i * 20))
 	}
 
-	answer := ac1.andNot(ac2)
+	answer := ac1.andNotArray(ac2)
 	if answer.cardinality != ac1.cardinality {
 		t.Errorf("Cardinality: %d, want: %d", answer.cardinality, ac1.cardinality)
 	}
@@ -273,7 +273,7 @@ func TestAndNotBitmap_2(t *testing.T) {
 		ac.add(uint16(i))
 	}
 
-	answer := ac.andNot(bc)
+	answer := ac.andNotArray(bc)
 	if answer.cardinality != ac.cardinality {
 		t.Errorf("Cardinality: %d, want: %d", answer.cardinality, ac.cardinality)
 	}
@@ -292,7 +292,7 @@ func TestAndNotBitmap_3(t *testing.T) {
 		bc.add(uint16(i))
 	}
 
-	answer := ac.andNot(bc)
+	answer := ac.andNotArray(bc)
 	if answer.cardinality != 0 {
 		t.Errorf("Cardinality: %d, want: %d", answer.cardinality, ac.cardinality)
 	}
@@ -315,7 +315,7 @@ func TestAndNotBitmap_4(t *testing.T) {
 		bc.add(uint16(i * 20))
 	}
 
-	answer := ac.andNot(bc)
+	answer := ac.andNotArray(bc)
 	if answer.cardinality != ac.cardinality {
 		t.Errorf("Cardinality: %d, want: %d", answer.cardinality, ac.cardinality)
 	}

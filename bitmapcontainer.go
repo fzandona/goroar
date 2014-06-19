@@ -142,6 +142,45 @@ func (bc *bitmapContainer) xorBitmap(other *bitmapContainer) container {
 	}
 	return answer
 }
+func (bc *bitmapContainer) andNot(other container) container {
+	switch oc := other.(type) {
+	case *arrayContainer:
+		return bc.andNotArray(oc)
+	case *bitmapContainer:
+		return bc.andNotBitmap(oc)
+	}
+	return nil
+}
+
+func (bc *bitmapContainer) andNotArray(ac *arrayContainer) container {
+	answer := bc.clone()
+	for i := 0; i < ac.cardinality; i++ {
+		v := ac.content[i]
+		mod := v % 64
+		index := v / 64
+		shift := one << v
+		answer.bitmap[index] = answer.bitmap[index] & (^shift)
+		answer.cardinality -= int((answer.bitmap[index] ^ bc.bitmap[index]) >> mod)
+	}
+	if answer.cardinality <= arrayContainerMaxSize {
+		return answer.toArrayContainer()
+	}
+	return answer
+}
+
+func (bc *bitmapContainer) andNotBitmap(other *bitmapContainer) container {
+	answer := newBitmapContainer()
+
+	for i := 0; i < len(bc.bitmap); i++ {
+		answer.bitmap[i] = bc.bitmap[i] & (^other.bitmap[i])
+		answer.cardinality = answer.cardinality + countBits(answer.bitmap[i])
+	}
+
+	if answer.cardinality <= arrayContainerMaxSize {
+		return answer.toArrayContainer()
+	}
+	return answer
+}
 
 func (bc *bitmapContainer) clone() *bitmapContainer {
 	bitmap := make([]uint64, len(bc.bitmap))
