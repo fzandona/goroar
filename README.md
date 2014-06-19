@@ -5,7 +5,6 @@ goroar
 
 **TODO**
 
-* Bitwise andNot (in-place)
 * Immutable bitwise operations
 * Serialization
 * More idiomatic Go 
