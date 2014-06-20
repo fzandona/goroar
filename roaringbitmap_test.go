@@ -66,8 +66,8 @@ func TestAdd_3(t *testing.T) {
 
 	rb.Add(uint32(0))
 	switch rb.containers[0].container.(type) {
-	case *bitmapContainer:
-		t.Error("BitmapContainer found, want ArrayContainer")
+	case *arrayContainer:
+		t.Error("ArrayContainer found, want BitmapContainer")
 	}
 
 	rb.Add(uint32(4096))

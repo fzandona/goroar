@@ -23,13 +23,14 @@ func (bc *bitmapContainer) loadData(ac *arrayContainer) {
 	}
 }
 
-func (bc *bitmapContainer) add(i uint16) {
+func (bc *bitmapContainer) add(i uint16) container {
 	x := uint32(i)
 	index := x / 64
 	mod := x % 64
 	previous := bc.bitmap[index]
 	bc.bitmap[index] |= one << mod
 	bc.cardinality += int((previous ^ bc.bitmap[index]) >> mod)
+	return bc
 }
 
 func (bc *bitmapContainer) and(other container) container {
