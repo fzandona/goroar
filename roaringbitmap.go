@@ -27,19 +27,7 @@ func (rb *RoaringBitmap) Add(x uint32) {
 	pos := rb.containerIndex(hb)
 	if pos >= 0 {
 		container := rb.containers[pos].container
-		switch typedContainer := container.(type) {
-		case *arrayContainer:
-			if typedContainer.add(lb) {
-				rb.containers[pos].container = typedContainer
-			} else { // we reached the AC capacity
-				bc := typedContainer.toBitmapContainer()
-				bc.add(lb)
-				rb.containers[pos].container = bc
-			}
-		case *bitmapContainer:
-			typedContainer.add(lb)
-			rb.containers[pos].container = typedContainer
-		}
+		rb.containers[pos].container = container.add(lb)
 	} else {
 		ac := newArrayContainer()
 		ac.add(lb)

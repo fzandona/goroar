@@ -31,28 +31,24 @@ func newArrayContainerRunOfOnes(firstOfRun, lastOfRun int) *arrayContainer {
 	return &arrayContainer{int(valuesInRange), content}
 }
 
-// ArrayContainer add returns false if it is time to switch to a
-// BitmapContainer - the integer is not added in this case.
-// TODO: check performance against just moving to BC before
-//      verifying the integer is distinct or not.
-func (ac *arrayContainer) add(x uint16) bool {
+func (ac *arrayContainer) add(x uint16) container {
+	if ac.cardinality >= arrayContainerMaxSize {
+		bc := ac.toBitmapContainer()
+		bc.add(x)
+		return bc
+	}
+
 	if ac.cardinality == 0 || x > ac.content[ac.cardinality-1] {
-		if ac.cardinality >= arrayContainerMaxSize {
-			return false
-		}
 		if ac.cardinality >= len(ac.content) {
 			ac.increaseCapacity()
 		}
 		ac.content[ac.cardinality] = x
 		ac.cardinality++
-		return true
+		return ac
 	}
 
 	loc := binarySearch(ac.content, ac.cardinality, x)
 	if loc < 0 {
-		if ac.cardinality >= arrayContainerMaxSize {
-			return false
-		}
 		if ac.cardinality >= len(ac.content) {
 			ac.increaseCapacity()
 		}
@@ -63,7 +59,7 @@ func (ac *arrayContainer) add(x uint16) bool {
 		ac.content[loc] = x
 		ac.cardinality++
 	}
-	return true
+	return ac
 }
 
 func (ac *arrayContainer) and(other container) container {

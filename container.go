@@ -1,6 +1,7 @@
 package goroar
 
 type container interface {
+	add(x uint16) container
 	and(x container) container
 	or(x container) container
 	andNot(x container) container
