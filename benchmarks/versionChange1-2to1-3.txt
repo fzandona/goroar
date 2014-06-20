@@ -1,0 +1,3 @@
+benchmark              old ns/op     new ns/op     delta      
+BenchmarkAdd           295           272           -7.80%     
+BenchmarkAddSorted     91.6          85.9          -6.22%     
