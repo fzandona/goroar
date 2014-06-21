@@ -1,4 +1,0 @@
-PASS
-BenchmarkAdd	50000000	       295 ns/op
-BenchmarkAddSorted	100000000	        91.6 ns/op
-ok  	github.com/fzandona/goroar/benchmarks	31.979s
