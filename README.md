@@ -8,4 +8,4 @@ goroar
 * Immutable bitwise operations
 * Serialization
 * More idiomatic Go 
-* Test re-factoring & benchmarking
+* Test re-factoring
