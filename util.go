@@ -375,7 +375,7 @@ func union2by2(set1 []uint16, length1 int,
 			}
 			if k2 >= length2 {
 				for ; k1 < length1; k1++ {
-					buffer[pos] = set2[k1]
+					buffer[pos] = set1[k1]
 					pos = pos + 1
 				}
 				break
@@ -386,7 +386,7 @@ func union2by2(set1 []uint16, length1 int,
 			k2 = k2 + 1
 			if k2 >= length2 {
 				for ; k1 < length1; k1++ {
-					buffer[pos] = set2[k1]
+					buffer[pos] = set1[k1]
 					pos = pos + 1
 				}
 				break
@@ -441,7 +441,7 @@ func exclusiveUnion2by2(set1 []uint16, length1 int,
 			}
 			if k2 >= length2 {
 				for ; k1 < length1; k1++ {
-					buffer[pos] = set2[k1]
+					buffer[pos] = set1[k1]
 					pos = pos + 1
 				}
 				break
@@ -452,7 +452,7 @@ func exclusiveUnion2by2(set1 []uint16, length1 int,
 			k2 = k2 + 1
 			if k2 >= length2 {
 				for ; k1 < length1; k1++ {
-					buffer[pos] = set2[k1]
+					buffer[pos] = set1[k1]
 					pos = pos + 1
 				}
 				break
