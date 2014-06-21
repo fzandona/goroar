@@ -1,11 +1,9 @@
-package test
+package goroar
 
 import (
 	"math/rand"
 	"sort"
 	"testing"
-
-	"github.com/fzandona/goroar"
 )
 
 var bitmapSize = 1000000
@@ -32,7 +30,7 @@ func getBuffer(size, seed int) []uint32 {
 }
 
 func BenchmarkAdd(b *testing.B) {
-	rb := goroar.New()
+	rb := New()
 	var pos int
 	buffer := getBuffer(bitmapSize, 42)
 
@@ -45,7 +43,7 @@ func BenchmarkAdd(b *testing.B) {
 }
 
 func BenchmarkAddSorted(b *testing.B) {
-	rb := goroar.New()
+	rb := New()
 	var pos int
 	buffer := getBuffer(bitmapSize, 42)
 	sort.Sort(Values(buffer))
@@ -59,7 +57,7 @@ func BenchmarkAddSorted(b *testing.B) {
 }
 
 func BenchmarkIterator(b *testing.B) {
-	rb := goroar.New()
+	rb := New()
 	var pos int
 	buffer := getBuffer(bitmapSize, 42)
 	sort.Sort(Values(buffer))
@@ -77,7 +75,7 @@ func BenchmarkIterator(b *testing.B) {
 }
 
 func BenchmarkContains(b *testing.B) {
-	rb := goroar.New()
+	rb := New()
 	var pos int
 	buffer := getBuffer(bitmapSize, 42)
 	sort.Sort(Values(buffer))
@@ -95,9 +93,9 @@ func BenchmarkContains(b *testing.B) {
 	}
 }
 
-func getTwoRB(size1, seed1, size2, seed2 int) (*goroar.RoaringBitmap, *goroar.RoaringBitmap) {
-	rb1 := goroar.New()
-	rb2 := goroar.New()
+func getTwoRB(size1, seed1, size2, seed2 int) (*RoaringBitmap, *RoaringBitmap) {
+	rb1 := New()
+	rb2 := New()
 
 	buffer := getBuffer(size1, seed1)
 	sort.Sort(Values(buffer))
@@ -178,9 +176,9 @@ func BenchmarkAndNotDifferentContent(b *testing.B) {
 	}
 }
 
-func getTwoSimpleRB(size1, size2 int) (*goroar.RoaringBitmap, *goroar.RoaringBitmap) {
-	rb1 := goroar.New()
-	rb2 := goroar.New()
+func getTwoSimpleRB(size1, size2 int) (*RoaringBitmap, *RoaringBitmap) {
+	rb1 := New()
+	rb2 := New()
 
 	for i := 0; i < size1; i++ {
 		rb1.Add(uint32(i))
