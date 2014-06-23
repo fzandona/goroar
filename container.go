@@ -17,5 +17,5 @@ type container interface {
 	// serialize() error
 
 	getCardinality() int
-	// getSizeInBytes() int32
+	sizeInBytes() int
 }

@@ -2,7 +2,10 @@ package goroar
 
 import (
 	"bytes"
+	"log"
+	"os"
 	"strconv"
+	"text/template"
 )
 
 type entry struct {
@@ -291,6 +294,71 @@ func (rb *RoaringBitmap) String() string {
 	}
 	buffer.WriteString("]")
 	return buffer.String()
+}
+
+// Stats prints statistics about the Roaring Bitmap's internals.
+func (rb *RoaringBitmap) Stats() {
+	const output = `* Roaring Bitmap Stats *
+Cardinality: {{.Cardinality}}
+Size uncompressed: {{.UncompressedSize}} bytes
+Size compressed: {{.CompressedSize}} bytes
+Number of containers: {{.TotalContainers}}
+    {{.TotalAC}} ArrayContainers
+    {{.TotalBC}} BitmapContainers
+Average entries per ArrayContainer: {{.AverageAC}}
+Max entries per ArrayContainer: {{.MaxAC}}
+`
+	type stats struct {
+		Cardinality, TotalContainers, TotalAC, TotalBC int
+		AverageAC, MaxAC                               string
+		CompressedSize, UncompressedSize               int
+	}
+
+	var totalAC, totalBC, totalCardinalityAC int
+	var maxAC int
+
+	for _, c := range rb.containers {
+		switch typedContainer := c.container.(type) {
+		case *arrayContainer:
+			if typedContainer.cardinality > maxAC {
+				maxAC = typedContainer.cardinality
+			}
+			totalCardinalityAC += typedContainer.cardinality
+			totalAC++
+		case *bitmapContainer:
+			totalBC++
+		default:
+		}
+	}
+
+	s := new(stats)
+	s.Cardinality = rb.Cardinality()
+	s.TotalContainers = len(rb.containers)
+	s.TotalAC = totalAC
+	s.TotalBC = totalBC
+	s.CompressedSize = rb.SizeInBytes()
+	s.UncompressedSize = rb.Cardinality() * 4
+
+	if totalCardinalityAC > 0 {
+		s.AverageAC = string(totalCardinalityAC / totalAC)
+		s.MaxAC = string(maxAC)
+	} else {
+		s.AverageAC = "--"
+		s.MaxAC = "--"
+	}
+
+	t := template.Must(template.New("stats").Parse(output))
+	if err := t.Execute(os.Stdout, s); err != nil {
+		log.Println("RoaringBitmap stats: ", err)
+	}
+}
+
+func (rb *RoaringBitmap) SizeInBytes() int {
+	size := 8
+	for _, c := range rb.containers {
+		size += 2 + c.container.sizeInBytes()
+	}
+	return size
 }
 
 func (rb *RoaringBitmap) resize(newLength int) {

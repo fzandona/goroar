@@ -234,3 +234,7 @@ func (ac *arrayContainer) increaseCapacity() {
 	copy(newSlice, ac.content)
 	ac.content = newSlice
 }
+
+func (ac *arrayContainer) sizeInBytes() int {
+	return ac.cardinality*2 + 4
+}

@@ -236,3 +236,7 @@ func (bc *bitmapContainer) toArrayContainer() *arrayContainer {
 
 	return &arrayContainer{bc.cardinality, container}
 }
+
+func (bc *bitmapContainer) sizeInBytes() int {
+	return len(bc.bitmap) * 8
+}
