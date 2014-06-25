@@ -354,9 +354,9 @@ Max entries per ArrayContainer: {{.MaxAC}}
 }
 
 func (rb *RoaringBitmap) SizeInBytes() int {
-	size := 8
+	size := 12 // size of RoaringBitmap struct
 	for _, c := range rb.containers {
-		size += 2 + c.container.sizeInBytes()
+		size += 12 + c.container.sizeInBytes()
 	}
 	return size
 }

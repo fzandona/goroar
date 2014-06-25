@@ -236,5 +236,5 @@ func (ac *arrayContainer) increaseCapacity() {
 }
 
 func (ac *arrayContainer) sizeInBytes() int {
-	return ac.cardinality*2 + 4
+	return ac.cardinality*2 + 16
 }

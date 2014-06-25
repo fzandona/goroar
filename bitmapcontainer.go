@@ -238,5 +238,5 @@ func (bc *bitmapContainer) toArrayContainer() *arrayContainer {
 }
 
 func (bc *bitmapContainer) sizeInBytes() int {
-	return len(bc.bitmap) * 8
+	return 16 + len(bc.bitmap)*8
 }
