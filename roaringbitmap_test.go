@@ -5,6 +5,23 @@ import (
 	"testing"
 )
 
+func TestBitmapOf(t *testing.T) {
+	data := make([]uint32, 10)
+	var i int
+	for i = 0; i < 10; i++ {
+		data[i] = uint32(i * (1 << 16))
+	}
+
+	rb := BitmapOf(data...)
+	i = 0
+	for value := range rb.Iterator() {
+		if data[i] != value {
+			t.Errorf("BitmapOf error: %d, want: %d", value, data[i])
+		}
+		i++
+	}
+}
+
 func TestAdd(t *testing.T) {
 	rb := New()
 	rb.Add(42)

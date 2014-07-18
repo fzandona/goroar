@@ -23,6 +23,15 @@ func New() *RoaringBitmap {
 	return &RoaringBitmap{containers}
 }
 
+// BitmapOf generates a new bitmap with the specified values set to true. The provided values don't have to be in sorted order, but it may be preferable to sort them from a performance point of view.
+func BitmapOf(values ...uint32) *RoaringBitmap {
+	rb := New()
+	for _, value := range values {
+		rb.Add(value)
+	}
+	return rb
+}
+
 // Add adds a uint32 value to the RoaringBitmap
 func (rb *RoaringBitmap) Add(x uint32) {
 	hb, lb := highlowbits(x)
