@@ -444,6 +444,6 @@ func (rb *RoaringBitmap) increaseCapacity() {
 
 // And computes the bitwise AND operation on two RoaringBitmaps.
 // The input bitmaps are not modified.
-func And(x1, x2 *RoaringBitmap) *RoaringBitmap {
-	panic("Not implemented")
-}
+// func And(x1, x2 *RoaringBitmap) *RoaringBitmap {
+// 	panic("Not implemented")
+// }
