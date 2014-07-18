@@ -1,3 +1,5 @@
+// goroar is an implementation of Roaring Bitmaps in Golang.
+//Roaring bitmaps is a new form of compressed bitmaps, proposed by Daniel Lemire et. al., which often offers better compression and fast access than other compressed bitmap approaches.
 package goroar
 
 import (
