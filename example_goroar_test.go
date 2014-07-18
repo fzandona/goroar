@@ -10,7 +10,7 @@ import (
 func Example_goroar() {
 	rb1 := goroar.BitmapOf(1, 2, 3, 4, 5)
 	rb2 := goroar.BitmapOf(2, 3, 4)
-	rb3 := goroar.BitmapOf(1)
+	rb3 := goroar.New()
 
 	fmt.Println("Cardinality: ", rb1.Cardinality())
 
@@ -18,6 +18,7 @@ func Example_goroar() {
 
 	rb1.And(rb2)
 
+	rb3.Add(1)
 	rb3.Add(5)
 
 	rb3.Or(rb1)
