@@ -323,7 +323,7 @@ func (rb *RoaringBitmap) Stats() {
 	const output = `* Roaring Bitmap Stats *
 Cardinality: {{.Cardinality}}
 Size uncompressed: {{.UncompressedSize}} bytes
-Size compressed: {{.CompressedSize}} bytes
+Size compressed: {{.CompressedSize}} bytes ({{.CompressionRate}}%)
 Number of containers: {{.TotalContainers}}
     {{.TotalAC}} ArrayContainers
     {{.TotalBC}} BitmapContainers
@@ -334,6 +334,7 @@ Max entries per ArrayContainer: {{.MaxAC}}
 		Cardinality, TotalContainers, TotalAC, TotalBC int
 		AverageAC, MaxAC                               string
 		CompressedSize, UncompressedSize               int
+		CompressionRate                                string
 	}
 
 	var totalAC, totalBC, totalCardinalityAC int
@@ -360,6 +361,8 @@ Max entries per ArrayContainer: {{.MaxAC}}
 	s.TotalBC = totalBC
 	s.CompressedSize = rb.SizeInBytes()
 	s.UncompressedSize = rb.Cardinality() * 4
+	s.CompressionRate = fmt.Sprintf("%3.1f",
+		float32(s.CompressedSize)/float32(s.UncompressedSize)*100.0)
 
 	if totalCardinalityAC > 0 {
 		s.AverageAC = fmt.Sprintf("%6.2f", float32(totalCardinalityAC)/float32(totalAC))
