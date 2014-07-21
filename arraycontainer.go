@@ -238,3 +238,9 @@ func (ac *arrayContainer) increaseCapacity() {
 func (ac *arrayContainer) sizeInBytes() int {
 	return ac.cardinality*2 + 16
 }
+
+func (ac *arrayContainer) clone() container {
+	newContent := make([]uint16, len(ac.content), cap(ac.content))
+	copy(newContent, ac.content)
+	return &arrayContainer{ac.cardinality, newContent}
+}

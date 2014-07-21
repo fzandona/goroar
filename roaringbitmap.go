@@ -291,6 +291,16 @@ func (rb *RoaringBitmap) Iterator() <-chan uint32 {
 	return ch
 }
 
+// Clone returns a copy of the original RoaringBitmap
+func (rb *RoaringBitmap) Clone() *RoaringBitmap {
+	containers := make([]entry, len(rb.containers))
+	for i, value := range rb.containers {
+		containers[i] = entry{value.key, value.container.clone()}
+	}
+	// copy(containers, rb.containers[0:])
+	return &RoaringBitmap{containers}
+}
+
 func (rb *RoaringBitmap) String() string {
 	var buffer bytes.Buffer
 	name := []byte("RoaringBitmap[")

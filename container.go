@@ -9,7 +9,7 @@ type container interface {
 	xor(x container) container
 
 	// trim()
-	// clone() container
+	clone() container
 	// clear()
 	contains(x uint16) bool
 

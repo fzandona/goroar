@@ -741,3 +741,52 @@ func TestInsertAt(t *testing.T) {
 		t.Errorf("insertAt error")
 	}
 }
+
+func TestClone(t *testing.T) {
+	data := []uint32{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	rb := BitmapOf(data...)
+
+	clone := rb.Clone()
+	i := 0
+	for value := range clone.Iterator() {
+		if value != data[i] {
+			t.Errorf("Clone error: %d, want: %d", value, data[i])
+		}
+		i++
+	}
+
+	rb.Add(1024)
+
+	if clone.Contains(1024) {
+		t.Error("Clone changed when changing original bitmap.")
+	}
+}
+
+func TestClone2(t *testing.T) {
+	rb := New()
+	count := 5000
+	// creates 5 containers with keys: 1, 2, 4, 8, 16
+	for shift := uint(16); shift <= 20; shift++ {
+		base := uint32(1 << shift)
+		for i := 0; i < count; i++ {
+			value := base + uint32(i)
+			rb.Add(value)
+		}
+	}
+
+	clone := rb.Clone()
+
+	i := 0
+	for value := range rb.Iterator() {
+		if !clone.Contains(value) {
+			t.Errorf("Clone error, missing value: %d", value)
+		}
+		i++
+	}
+
+	rb.Add(1024)
+
+	if clone.Contains(1024) {
+		t.Error("Clone changed when changing original bitmap.")
+	}
+}

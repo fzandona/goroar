@@ -87,7 +87,7 @@ func (bc *bitmapContainer) or(other container) container {
 }
 
 func (bc *bitmapContainer) orArray(ac *arrayContainer) *bitmapContainer {
-	answer := bc.clone()
+	answer := bc.clone().(*bitmapContainer)
 	for i := 0; i < ac.cardinality; i++ {
 		answer.add(ac.content[i])
 	}
@@ -114,7 +114,7 @@ func (bc *bitmapContainer) xor(other container) container {
 }
 
 func (bc *bitmapContainer) xorArray(ac *arrayContainer) container {
-	answer := bc.clone()
+	answer := bc.clone().(*bitmapContainer)
 	for i := 0; i < ac.cardinality; i++ {
 		v := ac.content[i]
 		mod := v % 64
@@ -154,7 +154,7 @@ func (bc *bitmapContainer) andNot(other container) container {
 }
 
 func (bc *bitmapContainer) andNotArray(ac *arrayContainer) container {
-	answer := bc.clone()
+	answer := bc.clone().(*bitmapContainer)
 	for i := 0; i < ac.cardinality; i++ {
 		v := ac.content[i]
 		mod := v % 64
@@ -183,7 +183,7 @@ func (bc *bitmapContainer) andNotBitmap(other *bitmapContainer) container {
 	return answer
 }
 
-func (bc *bitmapContainer) clone() *bitmapContainer {
+func (bc *bitmapContainer) clone() container { //*bitmapContainer {
 	bitmap := make([]uint64, len(bc.bitmap))
 	copy(bitmap, bc.bitmap)
 	return &bitmapContainer{bc.cardinality, bitmap}
