@@ -4,6 +4,7 @@ package goroar
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -361,8 +362,8 @@ Max entries per ArrayContainer: {{.MaxAC}}
 	s.UncompressedSize = rb.Cardinality() * 4
 
 	if totalCardinalityAC > 0 {
-		s.AverageAC = string(totalCardinalityAC / totalAC)
-		s.MaxAC = string(maxAC)
+		s.AverageAC = fmt.Sprintf("%6.2f", float32(totalCardinalityAC)/float32(totalAC))
+		s.MaxAC = fmt.Sprintf("%d", maxAC)
 	} else {
 		s.AverageAC = "--"
 		s.MaxAC = "--"

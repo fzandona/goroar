@@ -774,6 +774,10 @@ func TestClone2(t *testing.T) {
 		}
 	}
 
+	for i := 0; i < 4096; i++ {
+		rb.Add(uint32(i))
+	}
+
 	clone := rb.Clone()
 
 	i := 0
@@ -784,9 +788,9 @@ func TestClone2(t *testing.T) {
 		i++
 	}
 
-	rb.Add(1024)
+	rb.Add(4097)
 
-	if clone.Contains(1024) {
+	if clone.Contains(4097) {
 		t.Error("Clone changed when changing original bitmap.")
 	}
 }
