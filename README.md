@@ -87,7 +87,7 @@ TODO
 ----
 
 * Immutable bitwise operations
-* Flip, clone, clear operations
+* Flip, ~~clone~~, clear operations
 * Serialization
 * More idiomatic Go
 * Test re-factoring & coverage
